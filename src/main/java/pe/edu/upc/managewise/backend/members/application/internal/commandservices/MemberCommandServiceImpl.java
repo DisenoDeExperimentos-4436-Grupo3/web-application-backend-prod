@@ -38,12 +38,15 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     public Optional<Member> handle(UpdateMemberCommand command) {
         var memberId = command.memberId();
         var fullName = command.fullName();
-        if (this.memberRepository.existsByFullName(fullName)) {
+        
+        // ✅ CORECCIÓN: Validar que no exista otro miembro con el mismo nombre (excluyendo el actual)
+        if (this.memberRepository.existsByFullNameAndIdIsNot(fullName, memberId)) {
             throw new IllegalArgumentException("Member with full name " + fullName + " already exists");
         }
-        // If the profile does not exist, throw an exception
+        
+        // ✅ CORECCIÓN: Verificar que el miembro existe antes de actualizar
         if (!this.memberRepository.existsById(memberId)) {
-            throw new IllegalArgumentException("Profile with id " + memberId + " does not exist");
+            throw new IllegalArgumentException("Member with id " + memberId + " does not exist");
         }
 
         var memberToUpdate = this.memberRepository.findById(memberId).get();
@@ -57,16 +60,11 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         }
     }
 
-
     @Override
     public void handle(DeleteMemberCommand command) {
-        // If the profile does not exist, throw an exception
-        //condition if the id value exists or not to delete it
         if (!this.memberRepository.existsById(command.memberId())) {
             throw new IllegalArgumentException("Member with id " + command.memberId() + " does not exist");
         }
-        //Save and Try-catch
-        // Try to delete the profile, if an error occurs, throw an exception
         try {
             this.memberRepository.deleteById(command.memberId());
         } catch (Exception e) {
