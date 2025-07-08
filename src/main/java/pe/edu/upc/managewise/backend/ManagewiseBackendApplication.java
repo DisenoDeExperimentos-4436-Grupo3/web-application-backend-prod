@@ -19,7 +19,7 @@ public class ManagewiseBackendApplication {
 		System.out.println("📄 .env exists? " + new File(".env").exists());
 		Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
 
-		String secret = dotenv.get("RECAPTCHA_SECRET");
+		String secret = dotenv.get("RECAPTCHA_SECRET_KEY");
 		String verifyUrl = dotenv.get("RECAPTCHA_VERIFY_URL");
 
 		if (secret == null || verifyUrl == null) {
